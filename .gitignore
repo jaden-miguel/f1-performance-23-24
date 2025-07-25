@@ -2,3 +2,4 @@ venv/
 __pycache__/
 *.pyc
 data/f1_cache/
+.DS_Store
