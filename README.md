@@ -1,21 +1,21 @@
 # 🏎️ F1 Driver Time Gap Analysis (2023–2024)
 
-This Python project analyzes Formula 1 driver performance across the 2023 and 2024 seasons using real-world data fetched from the [FastF1](https://theoehrly.github.io/Fast-F1/) API. It summarizes driver standings, total points, and year-over-year trends — and visualizes the results with interactive Plotly charts.
+This Python project analyzes Formula 1 driver performance across the 2023 and 2024 seasons using real-world race data fetched with the [FastF1](https://theoehrly.github.io/Fast-F1/) Python library. It calculates each driver's average time gap to the race winner — visualized side by side by team and season with interactive Plotly charts.
 
-Designed for data analysts looking to demonstrate skills in data ingestion, transformation, and visualization with clean, modular Python scripts.
+Designed for data analysts looking to demonstrate skills in data ingestion, transformation, and visualization using clean, modular Python scripts — no Jupyter notebooks required.
 
-Made by Jaden Ji Miguel, July 2025
+Made by **Jaden Ji Miguel**, July 2025
 
 ---
 
 ## 📦 Features
 
-- ✅ Live data from [FastF1](https://theoehrly.github.io/Fast-F1/) (no manual downloads)
-- ⏱️ Calculates average time gaps to the race winner
-- 🧩 Automatically maps driver names and teams
-- 📊 Compares seasons 2023 vs 2024
-- 📈 Interactive Plotly bar chart
-- 🧹 Modular, clean codebase (no notebooks)
+- ✅ **Live F1 data** via FastF1 (no manual downloads)
+- ⏱️ Calculates **average time gap** to race winners per driver
+- 🧩 Automatically maps drivers to names and teams
+- 📊 Compares **2023 vs 2024** side by side
+- 📈 Interactive Plotly bar chart grouped by team
+- 🧹 Modular Python codebase, perfect for GitHub portfolios
 
 ---
 
@@ -25,17 +25,17 @@ Made by Jaden Ji Miguel, July 2025
 
 f1-performance-23-24/
 ├── data/
-│   ├── driver_time_gaps.csv     ← Per-race time gaps (from FastF1)
-│   └── avg_time_gaps.csv        ← Aggregated average gaps per driver/season
+│   ├── driver\_time\_gaps.csv     ← Raw time gap data (per race)
+│   └── avg\_time\_gaps.csv        ← Aggregated gaps by driver and season
 ├── src/
-│   ├── data_fetch.py            ← Pulls and caches live data via FastF1
-│   ├── data_processing.py       ← Cleans and aggregates time gap data
-│   ├── analysis.py              ← Further summary/statistical analysis
-│   └── visualization.py         ← Builds interactive visualizations
+│   ├── data\_fetch.py            ← Pulls and caches race data via FastF1
+│   ├── data\_processing.py       ← Cleans and summarizes time gap data
+│   ├── analysis.py              ← Optional deeper analysis
+│   └── visualization.py         ← Generates Plotly visualizations
 ├── assets/
-│   └── example_output.png       ← Chart screenshot
+│   └── example\_output.png       ← Screenshot of the output chart
 ├── requirements.txt             ← Python dependencies
-└── README.md                    ← Project overview
+└── README.md                    ← Project documentation
 
 ````
 
@@ -44,7 +44,6 @@ f1-performance-23-24/
 ## 🚀 Getting Started
 
 ### 1. Clone and Set Up
-
 ```bash
 git clone git@github.com:jaden-miguel/f1-performance-23-24.git
 cd f1-performance-23-24
@@ -63,7 +62,7 @@ python src/data_processing.py
 python src/analysis.py
 ```
 
-This will generate:
+✅ This will create:
 
 ```
 data/driver_time_gaps.csv
@@ -72,19 +71,19 @@ data/avg_time_gaps.csv
 
 ---
 
-### 3. Visualize with Plotly
+### 3. Visualize Driver Gaps
 
 ```bash
 python src/visualization.py
 ```
 
-✅ Opens an interactive bar chart comparing each driver’s average time gap to the race winner — side by side by team and season.
+✅ Opens an interactive grouped bar chart comparing each driver’s average time gap to the race winner — side by side by team and season.
 
 ---
 
 ## 📷 Example Output
 
-![F1 Gap Chart](assets/newplot.png)
+![F1 Gap Chart](assets/example_output.png)
 
 ---
 
@@ -96,7 +95,7 @@ Install everything with:
 pip install -r requirements.txt
 ```
 
-Key packages:
+Core packages:
 
 * [`fastf1`](https://pypi.org/project/fastf1/)
 * `pandas`
@@ -106,34 +105,36 @@ Key packages:
 
 ## 🧠 What You’ll Learn
 
-* How to use `FastF1` for live F1 telemetry and result data
-* Time gap analysis based on raw lap timing
-* Season-to-season performance comparison
-* Interactive storytelling with Plotly
-* Clean code and folder structure
+* How to use **FastF1** to pull live F1 race timing and telemetry data
+* Analyzing **time gaps** and performance patterns by season
+* Creating **interactive visualizations** using Plotly
+* Writing **clean, modular Python scripts**
+* Managing a project with real-time data and GitHub best practices
 
 ---
 
 ## 📚 Data Source
 
-* [FastF1](https://theoehrly.github.io/Fast-F1/) — A Python API wrapper for live Formula 1 timing and telemetry
-* Pulls official Formula1.com session data
+* **[FastF1](https://theoehrly.github.io/Fast-F1/)** – a Python wrapper for live and historical Formula 1 timing data
+* Data comes from official Formula1.com endpoints (cached locally by FastF1)
 
 ---
 
 ## 💼 Why This Project?
 
-This project demonstrates:
+This project showcases:
 
-* 🔁 End-to-end data pipeline (from live API → analysis → visualization)
-* 💡 Insight-driven design (focus on real driver gaps, not just points)
-* 🧠 Data storytelling and technical fluency
+* 🔁 End-to-end data pipeline — from live data ingestion to analysis and dashboard
+* 📈 Insight-driven analysis (focus on actual race gaps, not just points)
+* 💡 Real-world Python coding for technical interviews or portfolios
+* 🧹 Strong file organization and modular script design
+* 🌍 Real-time sports data applications — a great domain for storytelling
 
 ---
 
 ## 🪪 License
 
-MIT License — feel free to use or extend for your own racing or data projects.
+MIT License — feel free to fork or extend this project for your own F1 or data science ideas.
 
 ---
 
