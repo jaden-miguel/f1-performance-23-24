@@ -15,6 +15,7 @@ Made by **Jaden Ji Miguel**, July 2025
 - 🧩 Automatically maps drivers to names and teams
 - 📊 Compares **2023 vs 2024** side by side
 - 📈 Interactive Plotly bar chart grouped by team
+- 🧪 **Playwright E2E coverage** for the interactive dashboard
 - 🧹 Modular Python codebase, perfect for GitHub portfolios
 
 ---
@@ -32,6 +33,8 @@ f1-performance-23-24/
 │   ├── data\_processing.py       ← Cleans and summarizes time gap data
 │   ├── analysis.py              ← Optional deeper analysis
 │   └── visualization.py         ← Generates Plotly visualizations
+├── dist/
+│   └── driver\_gap\_dashboard.html← Exported interactive dashboard for testing
 ├── assets/
 │   └── example\_output.png       ← Screenshot of the output chart
 ├── requirements.txt             ← Python dependencies
@@ -74,16 +77,40 @@ data/avg_time_gaps.csv
 ### 3. Visualize Driver Gaps
 
 ```bash
-python src/visualization.py
+python src/visualization.py --output-html dist/driver_gap_dashboard.html --show
 ```
 
-✅ Opens an interactive grouped bar chart comparing each driver’s average time gap to the race winner — side by side by team and season.
+✅ Exports `dist/driver_gap_dashboard.html` and (optionally) opens the interactive grouped bar chart comparing each driver’s average time gap to the race winner — side by side by team and season.
+
+---
+
+### 4. Run Automated Dashboard Tests
+
+```bash
+playwright install        # one-time browser download
+pytest -m e2e
+```
+
+The `pytest` suite spins up a lightweight HTTP server, launches the dashboard in Chromium via Playwright, asserts Plotly interactions (hover states, legend toggles), and cross-checks the rendered bars against `data/avg_time_gaps.csv` via `APIRequestContext`.
 
 ---
 
 ## 📷 Example Output
 
 ![F1 Gap Chart](assets/example_output.png)
+
+---
+
+## 🧪 Automated Dashboard Testing with Playwright
+
+Hands-on testing experience is baked into this project using [Playwright](https://playwright.dev/python/) with the Python test runner:
+
+- The interactive dashboard exported by `src/visualization.py` is exercised end-to-end by the suite in `tests/e2e/test_dashboard.py`.
+- Dynamic Plotly elements are probed via locator assertions to ensure hover tooltips, legend filtering, and responsive resizing all behave consistently.
+- Each test leverages `APIRequestContext` to validate upstream FastF1-derived CSV responses before and after UI interactions, guaranteeing data integrity across sessions.
+- These tests run alongside the Python codebase (`pytest -m e2e`), making it easy to demonstrate full-stack ownership of data, visualization, and quality automation within the same repo.
+
+If you want to reproduce the Playwright suite locally, install the Python Playwright dependencies (`pip install -r requirements.txt`) and run `playwright install` once to fetch the browsers before executing your E2E scenarios.
 
 ---
 

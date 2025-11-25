@@ -2,3 +2,6 @@ fastf1==3.1.5
 tqdm
 pandas
 plotly
+pytest
+pytest-playwright
+playwright
