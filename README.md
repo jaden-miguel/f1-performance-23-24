@@ -15,6 +15,7 @@ Made by **Jaden Ji Miguel**, July 2025
 - 🧩 Automatically maps drivers to names and teams
 - 📊 Compares **2023 vs 2024** side by side
 - 📈 Interactive Plotly bar chart grouped by team
+- 🧪 **Playwright E2E coverage** for the interactive dashboard
 - 🧹 Modular Python codebase, perfect for GitHub portfolios
 
 ---
@@ -84,6 +85,19 @@ python src/visualization.py
 ## 📷 Example Output
 
 ![F1 Gap Chart](assets/example_output.png)
+
+---
+
+## 🧪 Automated Dashboard Testing with Playwright
+
+Hands-on testing experience is baked into this project using [Playwright](https://playwright.dev/python/) with the Python test runner:
+
+- The interactive dashboard is exercised end-to-end with Playwright scripts that launch the page, navigate between tabs, and interact with Plotly traces just as a user would.
+- Dynamic Plotly elements are probed via locator assertions to ensure hover tooltips, legend filtering, and responsive resizing all behave consistently.
+- Each test leverages `APIRequestContext` to validate upstream FastF1-derived API responses before and after UI interactions, guaranteeing data integrity across sessions.
+- These tests run alongside the Python codebase, making it easy to demonstrate full-stack ownership of data, visualization, and quality automation within the same repo.
+
+If you want to reproduce the Playwright suite locally, install the Python Playwright dependencies (e.g., `pip install playwright pytest-playwright`) and run `playwright install` once to fetch the browsers before executing your E2E scenarios.
 
 ---
 
