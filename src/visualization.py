@@ -1,8 +1,15 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+from typing import Iterable
+
 import pandas as pd
 import plotly.express as px
 
-# Load raw data
-df = pd.read_csv("data/avg_time_gaps.csv")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_PATH = PROJECT_ROOT / "data" / "avg_time_gaps.csv"
+DEFAULT_HTML_OUTPUT = PROJECT_ROOT / "dist" / "driver_gap_dashboard.html"
 
 # Mapping: Abbreviation → (Full Name, Team)
 driver_meta = {
@@ -32,22 +39,6 @@ driver_meta = {
     "BEA": ("Unknown", "Unknown"),  # To prevent KeyError
 }
 
-# Filter out unknown drivers
-df = df[df["Driver"].isin(driver_meta)]
-
-# Add metadata
-df["FullName"] = df["Driver"].map(lambda d: driver_meta[d][0])
-df["Team"] = df["Driver"].map(lambda d: driver_meta[d][1])
-
-# Remove unknown teams or drivers
-df = df[df["Team"] != "Unknown"]
-
-# Ensure both drivers per team per year
-team_driver_counts = df.groupby(["Team", "Season"])["Driver"].nunique().unstack()
-valid_teams = team_driver_counts[(team_driver_counts[2023] == 2) & (team_driver_counts[2024] == 2)].index
-df = df[df["Team"].isin(valid_teams)]
-
-# Define team colors
 team_colors = {
     "Red Bull": "#1E41FF",
     "Ferrari": "#DC0000",
@@ -58,43 +49,87 @@ team_colors = {
     "Alpine": "#FF87BC",
     "Kick Sauber": "#52E252",
     "Haas": "#B6BABD",
-    "Williams": "#37BEDD"
+    "Williams": "#37BEDD",
 }
 
-# Driver-specific color mapping
-driver_colors = {
-    driver: team_colors[driver_meta[driver][1]]
-    for driver in df["Driver"].unique()
-    if driver in driver_meta and driver_meta[driver][1] in team_colors
-}
 
-# Composite label for bar alignment: Team + Driver + Season
-df["TeamDriver"] = df["Team"] + " | " + df["Driver"] + " | " + df["Season"].astype(str)
+def _prepare_dataframe(data_path: Path = DATA_PATH) -> pd.DataFrame:
+    """Load and enrich the raw time gap data for visualization."""
+    df = pd.read_csv(data_path)
+    df = df[df["Driver"].isin(driver_meta)].copy()
+    df["FullName"] = df["Driver"].map(lambda d: driver_meta[d][0])
+    df["Team"] = df["Driver"].map(lambda d: driver_meta[d][1])
+    df = df[df["Team"] != "Unknown"].copy()
 
-# Sort by team and driver for consistent bar order
-df = df.sort_values(by=["Team", "Driver", "Season"])
+    team_driver_counts = df.groupby(["Team", "Season"])["Driver"].nunique().unstack(fill_value=0)
+    team_driver_counts = team_driver_counts.reindex(columns=[2023, 2024], fill_value=0)
+    valid_teams = team_driver_counts[(team_driver_counts[2023] == 2) & (team_driver_counts[2024] == 2)].index
+    df = df[df["Team"].isin(valid_teams)].copy()
 
-# Create Plotly bar chart
-fig = px.bar(
-    df,
-    x="TeamDriver",
-    y="AvgGapToLeaderSec",
-    color="Driver",
-    color_discrete_map=driver_colors,
-    hover_data=["FullName", "Team", "Season", "AvgGapToLeaderSec"],
-    title="Average Time Gap to Race Winner by Driver (2023 & 2024)",
-    labels={"AvgGapToLeaderSec": "Avg Time Gap (s)", "TeamDriver": "Driver | Season"},
-    height=700
-)
+    df["TeamDriver"] = df["Team"] + " | " + df["Driver"] + " | " + df["Season"].astype(str)
+    df = df.sort_values(by=["Team", "Driver", "Season"])
+    return df
 
-# Tweak bar and label spacing
-fig.update_layout(
-    bargap=0.1,          # Small gap between different drivers
-    bargroupgap=0.02,    # Even tighter within teams
-    xaxis_tickangle=90,  # Vertical label
-    xaxis_tickfont=dict(size=10),
-    margin=dict(l=50, r=50, t=80, b=200),
-)
 
-# Show the final chart
-fig.show()
+def _driver_color_map(drivers: Iterable[str]) -> dict[str, str]:
+    return {
+        driver: team_colors[driver_meta[driver][1]]
+        for driver in drivers
+        if driver in driver_meta and driver_meta[driver][1] in team_colors
+    }
+
+
+def create_figure(data_path: Path = DATA_PATH):
+    """Create the Plotly figure for the dashboard."""
+    df = _prepare_dataframe(data_path)
+    driver_colors = _driver_color_map(df["Driver"].unique())
+    fig = px.bar(
+        df,
+        x="TeamDriver",
+        y="AvgGapToLeaderSec",
+        color="Driver",
+        color_discrete_map=driver_colors,
+        hover_data=["FullName", "Team", "Season", "AvgGapToLeaderSec"],
+        title="Average Time Gap to Race Winner by Driver (2023 & 2024)",
+        labels={"AvgGapToLeaderSec": "Avg Time Gap (s)", "TeamDriver": "Driver | Season"},
+        height=700,
+    )
+    fig.update_layout(
+        bargap=0.1,
+        bargroupgap=0.02,
+        xaxis_tickangle=90,
+        xaxis_tickfont=dict(size=10),
+        margin=dict(l=50, r=50, t=80, b=200),
+    )
+    return fig
+
+
+def build_dashboard(
+    data_path: Path = DATA_PATH,
+    output_html: Path = DEFAULT_HTML_OUTPUT,
+    open_browser: bool = False,
+):
+    """Persist the dashboard to an HTML file and optionally open it."""
+    fig = create_figure(data_path)
+    output_html = Path(output_html)
+    output_html.parent.mkdir(parents=True, exist_ok=True)
+    fig.write_html(str(output_html), include_plotlyjs="cdn", full_html=True)
+    if open_browser:
+        fig.show()
+    return output_html
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Build the interactive driver gap dashboard.")
+    parser.add_argument(
+        "--output-html",
+        default=str(DEFAULT_HTML_OUTPUT),
+        help="Path for the generated dashboard HTML file (default: dist/driver_gap_dashboard.html).",
+    )
+    parser.add_argument(
+        "--show",
+        action="store_true",
+        help="Open the dashboard in a browser window after exporting.",
+    )
+    args = parser.parse_args()
+    build_dashboard(output_html=Path(args.output_html), open_browser=args.show)

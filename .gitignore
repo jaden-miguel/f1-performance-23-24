@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 data/f1_cache/
 .DS_Store
+dist/
+playwright-report/
+test-results/
